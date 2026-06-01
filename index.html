@@ -81,7 +81,13 @@ import { getState, setState, clearAll } from './js/state.js';
 import { parseExcel }          from './js/excel.js';
 
 // Load defaults from single source of truth
-const DEFAULTS = await fetch('./defaults.json').then(r => r.json());
+let DEFAULTS;
+try {
+  DEFAULTS = await fetch('./defaults.json').then(r => r.json());
+} catch {
+  // Fallback to minimal defaults if fetch fails (e.g. first load offline)
+  DEFAULTS = { valid_classes:[1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0], valid_statuses:['C','R-NAO','R-FRD','VIDEO','VAL','NE',''] };
+}
 
 await loadTranslations();
 renderNav(1);

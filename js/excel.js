@@ -52,12 +52,7 @@ function cleanClass(val, validClasses) {
 
 function parseDate(val) {
   if (!val) return '';
-  if (val instanceof Date) {
-    const d = String(val.getDate()).padStart(2,'0');
-    const m = String(val.getMonth()+1).padStart(2,'0');
-    return `${d}/${m}/${val.getFullYear()}`;
-  }
-  // Excel serial date number
+  // SheetJS with cellDates:false returns Excel serial numbers for dates
   if (typeof val === 'number') {
     const date = new Date(Math.round((val - 25569) * 86400 * 1000));
     const d = String(date.getUTCDate()).padStart(2,'0');

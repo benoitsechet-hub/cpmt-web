@@ -1,6 +1,10 @@
 // ── Service Worker — offline cache ───────────────────────────────────────────
-const CACHE = 'cpmt-v1';
-const ASSETS = [
+// IMPORTANT: bump CACHE version on every deployment to force cache refresh.
+// Format: 'cpmt-YYYY-MM-DD' — update the date when deploying changes.
+const CACHE = 'cpmt-2026-05-21';
+
+// Core app assets — required for offline use
+const CORE_ASSETS = [
   './',
   './index.html',
   './summary.html',
@@ -21,13 +25,25 @@ const ASSETS = [
   './img/logo_WH.png',
   './img/flag_fr.svg',
   './img/flag_en.svg',
+];
+
+// Optional CDN assets — cached opportunistically, not blocking install
+const CDN_ASSETS = [
   'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
 ];
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE).then(async cache => {
+      // Cache core assets (fail fast if any missing)
+      await cache.addAll(CORE_ASSETS);
+      // Cache CDN assets individually — don't block install on CDN failure
+      await Promise.allSettled(
+        CDN_ASSETS.map(url =>
+          fetch(url).then(res => cache.put(url, res)).catch(() => {})
+        )
+      );
+    })
   );
   self.skipWaiting();
 });
@@ -41,12 +57,13 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Network first, fallback to cache
+// Network first, fallback to cache; cache put wrapped properly
 self.addEventListener('fetch', e => {
   e.respondWith(
     fetch(e.request)
       .then(res => {
         const clone = res.clone();
+        // Use waitUntil-equivalent: cache update does not block response
         caches.open(CACHE).then(cache => cache.put(e.request, clone));
         return res;
       })

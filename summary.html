@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/style.css">
+  <link rel="manifest" href="./manifest.json">
 </head>
 <body>
 <header class="app-header" id="app-header"></header>
@@ -53,7 +54,13 @@ await loadTranslations();
 renderNav(2);
 
 // Load defaults from single source of truth
-const DEFAULTS = await fetch('./defaults.json').then(r => r.json());
+let DEFAULTS;
+try {
+  DEFAULTS = await fetch('./defaults.json').then(r => r.json());
+} catch {
+  alert(t('error_offline'));
+  throw new Error('defaults unavailable');
+}
 let TEAMS   = getState('teams') || [];
 const CLASSES  = DEFAULTS.valid_classes;
 const STATUSES = DEFAULTS.valid_statuses;

@@ -32,7 +32,8 @@ export function requireTeams() {
 
 export function requireSetup() {
   if (!requireTeams()) return false;
-  if (!getState('match_setup')) {
+  // Both match_setup and competition_setup must exist to render lineup correctly
+  if (!getState('match_setup') || !getState('competition_setup')) {
     location.href = './setup.html'; return false;
   }
   return true;

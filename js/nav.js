@@ -5,7 +5,7 @@ import { getState } from './state.js';
 export function renderNav(step) {
   const lang      = getLang();
   const hasTeams  = !!(getState('teams')?.length);
-  const hasSetup  = !!(getState('match_setup'));
+  const hasSetup  = !!(getState('match_setup') && getState('competition_setup'));
 
   const steps = [
     { n:1, key:'step_load',  href:'./index.html',   enabled:true },
@@ -30,7 +30,7 @@ export function renderNav(step) {
   header.innerHTML = `
     <div class="header-inner">
       <div class="header-brand">
-        <img src="./img/logo_WH.png" alt="FFHB" class="header-logo"
+        <img src="./img/logo_WH.png" alt="${t('nav_logo_alt')}" class="header-logo"
              onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='flex'">
         <div class="header-logo-fallback" id="logo-fallback" style="display:none;">FFHB</div>
         <div class="header-divider"></div>
@@ -39,8 +39,9 @@ export function renderNav(step) {
           <span class="header-app">${t('app_title')}</span>
         </div>
       </div>
-      <a href="./docs/CPMT_tutoriel.pdf" class="tutorial-btn" target="_blank" title="Guide">
-        📄 Guide
+      <a href="./docs/CPMT_tutoriel.pdf" class="tutorial-btn" target="_blank"
+         rel="noopener" title="${t('nav_guide_btn')}">
+        ${t('nav_guide_btn')}
       </a>
       <div class="lang-toggle">
         <a href="#" class="lang-btn ${lang==='fr'?'active':''}" onclick="window.__setLang('fr');return false;">

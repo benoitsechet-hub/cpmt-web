@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/style.css">
+  <link rel="manifest" href="./manifest.json">
   <style>
     .app-main { padding: .75rem 1.25rem; }
     @media (max-width: 768px) { .app-main { padding: .4rem .5rem; } }
@@ -212,7 +213,7 @@ document.getElementById('lineupTitle').innerHTML =
 
 document.getElementById('lineupMeta').innerHTML =
   `${compName ? `🏆 ${escHtml(compName)} &nbsp;·&nbsp; ` : ''}${COMP.match_type} &nbsp;·&nbsp;
-   ${t('lineup_point_limit')}: <strong>${COMP.max_points}</strong> pts
+   ${t('lineup_point_limit')}: <strong>${COMP.max_points}</strong> ${t('lineup_pts_unit')}
    &nbsp;·&nbsp; ${t('lineup_women_min')}: <strong>${COMP.min_women}</strong>
    &nbsp;·&nbsp; ${t('lineup_valid_max')}: <strong>${COMP.max_valid}</strong>`;
 
@@ -227,14 +228,17 @@ document.getElementById('msbNameB').textContent = MATCH.team_b.name;
 document.getElementById('msbNameB').style.color = lightB ? 'var(--blue)' : JCB;
 document.getElementById('msbMatchInfo').innerHTML =
   `${compName ? `🏆 ${escHtml(compName)} &nbsp;·&nbsp; ` : ''}${COMP.match_type} &nbsp;·&nbsp;
-   ${COMP.max_points} pts &nbsp;·&nbsp; ♀ ≥${COMP.min_women} &nbsp;·&nbsp; val ≤${COMP.max_valid}`;
+   ${COMP.max_points} ${t('lineup_pts_unit')} &nbsp;·&nbsp; ${t('lineup_msb_women')}${COMP.min_women} &nbsp;·&nbsp; ${t('lineup_msb_valid')}${COMP.max_valid}`;
 
-document.getElementById('msbLabelA-pts').textContent   = `/ ${COMP.max_points}pts`;
-document.getElementById('msbLabelA-women').textContent = `♀ ≥${COMP.min_women}`;
-document.getElementById('msbLabelA-valid').textContent = `val ≤${COMP.max_valid}`;
-document.getElementById('msbLabelB-pts').textContent   = `/ ${COMP.max_points}pts`;
-document.getElementById('msbLabelB-women').textContent = `♀ ≥${COMP.min_women}`;
-document.getElementById('msbLabelB-valid').textContent = `val ≤${COMP.max_valid}`;
+const ptsLbl   = `/ ${COMP.max_points}${t('lineup_pts_unit')}`;
+const womenLbl = `${t('lineup_msb_women')}${COMP.min_women}`;
+const validLbl = `${t('lineup_msb_valid')}${COMP.max_valid}`;
+document.getElementById('msbLabelA-pts').textContent   = ptsLbl;
+document.getElementById('msbLabelA-women').textContent = womenLbl;
+document.getElementById('msbLabelA-valid').textContent = validLbl;
+document.getElementById('msbLabelB-pts').textContent   = ptsLbl;
+document.getElementById('msbLabelB-women').textContent = womenLbl;
+document.getElementById('msbLabelB-valid').textContent = validLbl;
 
 // Team panel headers
 const hdrA = document.getElementById('headerA');
@@ -267,7 +271,10 @@ function renderPlayers(team, players, jc, tc) {
     row.id = `row${team}-${i}`;
     row.dataset.team = team; row.dataset.idx = i;
     row.dataset.class = p.player_class; row.dataset.gender = p.gender;
+    row.setAttribute('role', 'button');
+    row.setAttribute('tabindex', '0');
     row.onclick = () => togglePlayer(team, i);
+    row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePlayer(team, i); } };
     row.innerHTML = `
       <div class="player-jersey-sm" id="jersey${team}-${i}"></div>
       <div class="player-name-sm">${escHtml(p.surname)}, ${escHtml(p.first_name)}</div>
