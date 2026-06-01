@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPMT – Teams</title>
+  <link rel="icon" href="./img/logo_WH.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+<header class="app-header" id="app-header"></header>
+
+<main class="app-main">
+  <div class="page-header">
+    <h1 data-i18n="summary_title"></h1>
+    <p class="mt-1" data-i18n="summary_hint"></p>
+  </div>
+
+  <div class="summary-toolbar">
+    <button class="btn btn-outline btn-sm" id="btnShowAddTeam" onclick="toggleAddTeamForm()">
+      <span class="lbl-full" data-i18n="summary_add_team"></span>
+      <span class="lbl-short" data-i18n="summary_add_team_short"></span>
+    </button>
+    <div class="add-team-form" id="addTeamForm">
+      <input type="text" class="form-control add-team-input" id="newTeamName"
+             data-i18n-placeholder="summary_new_team_placeholder"
+             onkeydown="if(event.key==='Enter') createTeam()">
+      <button class="btn btn-primary btn-sm" onclick="createTeam()" data-i18n="summary_create"></button>
+      <button class="btn btn-ghost btn-sm" onclick="toggleAddTeamForm()">✕</button>
+    </div>
+    <div class="summary-toolbar-right" style="margin-left:auto;display:flex;gap:.5rem;align-items:center;">
+      <span id="saveMsg" style="font-size:.8rem;color:var(--success);display:none;">✓ <span data-i18n="summary_saved"></span></span>
+      <button class="btn btn-primary btn-sm" onclick="saveAndContinue()">
+        <span class="lbl-full" data-i18n="summary_btn_continue"></span>
+        <span class="lbl-short" data-i18n="summary_btn_continue_short"></span>
+      </button>
+    </div>
+  </div>
+
+  <div id="teamList" class="team-list"></div>
+</main>
+
+<script type="module">
+import { loadTranslations, t } from './js/i18n.js';
+import { renderNav }           from './js/nav.js';
+import { getState, setState }  from './js/state.js';
+
+await loadTranslations();
+renderNav(2);
+
+const DEFAULTS = {
+  valid_classes:  [0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0],
+  valid_statuses: ['','A','B','C','N'],
+};
+let TEAMS   = getState('teams') || [];
+const CLASSES  = DEFAULTS.valid_classes;
+const STATUSES = DEFAULTS.valid_statuses;
+
+// ── Auto-save ─────────────────────────────────────────────────────────────────
+let _saveTimer = null;
+function scheduleSave() {
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveTeams, 1500);
+}
+function saveTeams(silent = false) {
+  const valid = TEAMS.every(team => {
+    const shirts = team.players.map(p => p.shirt_number);
+    return shirts.length === new Set(shirts).size;
+  });
+  if (!valid) { if (!silent) alert(t('summary_error_duplicate')); return false; }
+  setState('teams', TEAMS);
+  const msg = document.getElementById('saveMsg');
+  msg.style.display = 'inline';
+  clearTimeout(msg._t);
+  msg._t = setTimeout(() => msg.style.display = 'none', 2000);
+  return true;
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderTeams() {
+  const container = document.getElementById('teamList');
+  container.innerHTML = '';
+  TEAMS.forEach((team, ti) => {
+    const div = document.createElement('div');
+    div.className = 'team-item';
+    div.id = `team-${ti}`;
+    div.innerHTML = `
+      <div class="team-header" onclick="window._toggleTeam(${ti})">
+        <span class="team-name" id="teamName-${ti}">${escHtml(team.name)}</span>
+        <input type="text" class="form-control" id="teamNameInput-${ti}"
+               style="display:none;width:200px;font-weight:700;font-size:.9rem;padding:.2rem .5rem;"
+               value="${escHtml(team.name)}"
+               onclick="event.stopPropagation()"
+               onkeydown="if(event.key==='Enter') window._confirmRename(${ti}); if(event.key==='Escape') window._cancelRename(${ti})">
+        <div class="team-header-actions" onclick="event.stopPropagation()">
+          <span class="team-count" id="teamCount-${ti}">${team.players.length} ${t('summary_players')}</span>
+          <button class="btn-icon" id="btnRename-${ti}" style="color:var(--blue-mid);font-size:1.1rem;"
+                  title="${t('summary_rename_team')}" onclick="window._startRename(${ti})">✎</button>
+          <button class="btn-icon btn-icon-confirm" id="btnRenameOk-${ti}"
+                  style="display:none;color:var(--success);" onclick="window._confirmRename(${ti})">✓</button>
+          <button class="btn-icon" title="${t('summary_confirm_delete_team')}"
+                  onclick="window._deleteTeam(${ti})">🗑</button>
+        </div>
+        <span class="team-chevron">▼</span>
+      </div>
+      <div class="team-body">
+        <div class="table-scroll">
+          <table class="players-table" id="table-${ti}">
+            <thead><tr>
+              <th class="col-shirt">${t('summary_col_shirt')}</th>
+              <th>${t('summary_col_name')}</th>
+              <th class="col-dob">${t('summary_col_dob')}</th>
+              <th>${t('summary_col_gender')}</th>
+              <th>${t('summary_col_class')}</th>
+              <th class="col-status">${t('summary_col_status')}</th>
+              <th class="col-actions"></th>
+            </tr></thead>
+            <tbody id="tbody-${ti}"></tbody>
+          </table>
+        </div>
+        <div style="padding:.5rem .75rem;">
+          <button class="btn btn-outline btn-sm" onclick="window._showAddPlayer(${ti})">${t('summary_add_player')}</button>
+        </div>
+      </div>`;
+    container.appendChild(div);
+    renderPlayers(ti);
+  });
+}
+
+function renderPlayers(ti) {
+  const tbody = document.getElementById(`tbody-${ti}`);
+  tbody.innerHTML = '';
+  TEAMS[ti].players.forEach((p, pi) => {
+    const classOpts = CLASSES.map(c =>
+      `<option value="${c}" ${p.player_class === c ? 'selected' : ''}>${c.toFixed(1)}</option>`
+    ).join('');
+    const genderOpts = [['male', t('gender_male')],['female', t('gender_female')]].map(([v,l]) =>
+      `<option value="${v}" ${p.gender === v ? 'selected' : ''}>${l}</option>`
+    ).join('');
+    const statusOpts = STATUSES.map(s =>
+      `<option value="${s}" ${(p.sport_status||'') === s ? 'selected' : ''}>${s||'—'}</option>`
+    ).join('');
+    const tr = document.createElement('tr');
+    tr.id = `row-${ti}-${pi}`;
+    tr.innerHTML = `
+      <td class="col-shirt">
+        <input type="number" class="edit-input shirt-input" value="${p.shirt_number}" min="1" max="99"
+               onchange="window._updateShirt(${ti},${pi},this)">
+      </td>
+      <td class="col-name">
+        <input type="text" class="edit-input name-surname" style="text-transform:uppercase;"
+               value="${escHtml(p.surname)}"
+               onchange="window._updateField(${ti},${pi},'surname',this.value.trim().toUpperCase())">
+        <input type="text" class="edit-input name-firstname"
+               value="${escHtml(p.first_name)}"
+               onchange="window._updateField(${ti},${pi},'first_name',this.value.trim())">
+      </td>
+      <td class="col-dob">
+        <input type="text" class="edit-input" style="width:90px;" value="${p.dob||''}"
+               placeholder="${t('summary_placeholder_dob')}"
+               onchange="window._updateField(${ti},${pi},'dob',this.value.trim())">
+      </td>
+      <td class="col-gender">
+        <select class="edit-select" onchange="window._updateField(${ti},${pi},'gender',this.value)">${genderOpts}</select>
+      </td>
+      <td class="col-class">
+        <select class="edit-select" onchange="window._updateField(${ti},${pi},'player_class',parseFloat(this.value))">${classOpts}</select>
+      </td>
+      <td class="col-status">
+        <select class="edit-select" onchange="window._updateField(${ti},${pi},'sport_status',this.value)">${statusOpts}</select>
+      </td>
+      <td class="col-actions">
+        <button class="btn-icon" onclick="window._deletePlayer(${ti},${pi})" title="${t('summary_confirm_delete_player')}">✕</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+  const countEl = document.querySelector(`#team-${ti} .team-count`);
+  if (countEl) countEl.textContent = `${TEAMS[ti].players.length} ${t('summary_players')}`;
+}
+
+// ── CRUD ──────────────────────────────────────────────────────────────────────
+window._toggleTeam   = ti => document.getElementById(`team-${ti}`).classList.toggle('open');
+window._deletePlayer = (ti, pi) => {
+  if (!confirm(t('summary_confirm_delete_player'))) return;
+  TEAMS[ti].players.splice(pi, 1); renderPlayers(ti); scheduleSave();
+};
+window._deleteTeam = ti => {
+  if (!confirm(t('summary_confirm_delete_team', { name: TEAMS[ti].name }))) return;
+  TEAMS.splice(ti, 1); renderTeams(); scheduleSave();
+};
+window._startRename = ti => {
+  document.getElementById(`teamName-${ti}`).style.display = 'none';
+  document.getElementById(`btnRename-${ti}`).style.display = 'none';
+  const inp = document.getElementById(`teamNameInput-${ti}`);
+  inp.style.display = ''; inp.focus(); inp.select();
+  document.getElementById(`btnRenameOk-${ti}`).style.display = '';
+};
+window._confirmRename = ti => {
+  const inp  = document.getElementById(`teamNameInput-${ti}`);
+  const name = inp.value.trim();
+  if (!name) { inp.focus(); return; }
+  if (TEAMS.some((t, i) => i !== ti && t.name === name)) { alert(t('summary_error_team_exists')); return; }
+  TEAMS[ti].name = name;
+  document.getElementById(`teamName-${ti}`).textContent = name;
+  window._cancelRename(ti); scheduleSave();
+};
+window._cancelRename = ti => {
+  const inp = document.getElementById(`teamNameInput-${ti}`);
+  inp.value = TEAMS[ti].name; inp.style.display = 'none';
+  document.getElementById(`btnRenameOk-${ti}`).style.display = 'none';
+  document.getElementById(`teamName-${ti}`).style.display = '';
+  document.getElementById(`btnRename-${ti}`).style.display = '';
+};
+window._updateField = (ti, pi, field, value) => {
+  TEAMS[ti].players[pi][field] = value; scheduleSave();
+};
+window._updateShirt = (ti, pi, input) => {
+  const val = parseInt(input.value);
+  if (isNaN(val) || val < 1 || val > 99) { input.classList.add('error'); return; }
+  if (TEAMS[ti].players.some((p, i) => i !== pi && p.shirt_number === val)) {
+    input.classList.add('error'); input.title = t('summary_error_duplicate'); return;
+  }
+  input.classList.remove('error'); input.title = '';
+  TEAMS[ti].players[pi].shirt_number = val; scheduleSave();
+};
+window._showAddPlayer = ti => {
+  document.querySelectorAll('.add-player-row').forEach(r => r.remove());
+  const tbody    = document.getElementById(`tbody-${ti}`);
+  const classOpts  = CLASSES.map(c => `<option value="${c}">${c.toFixed(1)}</option>`).join('');
+  const genderOpts = [['male', t('gender_male')],['female', t('gender_female')]].map(([v,l]) =>
+    `<option value="${v}">${l}</option>`).join('');
+  const tr = document.createElement('tr');
+  tr.className = 'add-player-row'; tr.id = `add-row-${ti}`;
+  tr.innerHTML = `
+    <td class="col-shirt"><input type="number" id="ap-shirt-${ti}" placeholder="#" min="1" max="99"></td>
+    <td class="col-name">
+      <input type="text" id="ap-surname-${ti}" class="name-surname" placeholder="${t('summary_placeholder_surname')}">
+      <input type="text" id="ap-firstname-${ti}" class="name-firstname" placeholder="${t('summary_placeholder_firstname')}">
+    </td>
+    <td class="col-dob"><input type="text" id="ap-dob-${ti}" placeholder="${t('summary_placeholder_dob')}"></td>
+    <td class="col-gender"><select id="ap-gender-${ti}">${genderOpts}</select></td>
+    <td class="col-class"><select id="ap-class-${ti}">${classOpts}</select></td>
+    <td class="col-status"><select id="ap-status-${ti}">${STATUSES.map(s=>`<option value="${s}">${s||'—'}</option>`).join('')}</select></td>
+    <td><div class="add-player-actions">
+      <button class="btn btn-primary btn-xs" onclick="window._confirmAddPlayer(${ti})">✓</button>
+      <button class="btn btn-ghost btn-xs" onclick="document.getElementById('add-row-${ti}').remove()">✕</button>
+    </div></td>`;
+  tbody.appendChild(tr);
+  document.getElementById(`ap-shirt-${ti}`).focus();
+};
+window._confirmAddPlayer = ti => {
+  const shirt      = parseInt(document.getElementById(`ap-shirt-${ti}`).value);
+  const surname    = document.getElementById(`ap-surname-${ti}`).value.trim().toUpperCase();
+  const firstName  = document.getElementById(`ap-firstname-${ti}`).value.trim();
+  const dob        = document.getElementById(`ap-dob-${ti}`).value.trim();
+  const gender     = document.getElementById(`ap-gender-${ti}`).value;
+  const playerClass= parseFloat(document.getElementById(`ap-class-${ti}`).value);
+  const sportStatus= document.getElementById(`ap-status-${ti}`).value.trim();
+  if (isNaN(shirt)||shirt<1||shirt>99) { alert(t('summary_error_invalid_shirt')); return; }
+  if (!surname) { alert(t('summary_error_last_name_required')); return; }
+  if (TEAMS[ti].players.some(p => p.shirt_number === shirt)) { alert(t('summary_error_duplicate')); return; }
+  TEAMS[ti].players.push({ shirt_number:shirt, surname, first_name:firstName, dob, gender, player_class:playerClass, sport_status:sportStatus });
+  renderPlayers(ti); scheduleSave();
+};
+
+// ── Toolbar ───────────────────────────────────────────────────────────────────
+window.toggleAddTeamForm = () => {
+  const form = document.getElementById('addTeamForm');
+  const btn  = document.getElementById('btnShowAddTeam');
+  const visible = form.classList.toggle('visible');
+  btn.style.display = visible ? 'none' : '';
+  if (visible) document.getElementById('newTeamName').focus();
+};
+window.createTeam = () => {
+  const inp  = document.getElementById('newTeamName');
+  const name = inp.value.trim();
+  if (!name) { inp.focus(); return; }
+  if (TEAMS.some(team => team.name === name)) { alert(t('summary_error_team_exists')); return; }
+  TEAMS.push({ name, players:[] });
+  inp.value = '';
+  window.toggleAddTeamForm();
+  renderTeams();
+  const items = document.querySelectorAll('.team-item');
+  items[items.length-1].classList.add('open');
+  scheduleSave();
+};
+window.saveAndContinue = () => {
+  if (saveTeams(false)) location.href = './setup.html';
+};
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+renderTeams();
+</script>
+</body>
+</html>

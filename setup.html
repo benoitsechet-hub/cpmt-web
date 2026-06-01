@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPMT – Setup</title>
+  <link rel="icon" href="./img/logo_WH.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+<header class="app-header" id="app-header"></header>
+
+<main class="app-main">
+  <div class="page-header">
+    <h1 data-i18n="step_setup"></h1>
+  </div>
+
+  <div class="setup-grid">
+
+    <!-- ── Competition setup ── -->
+    <div class="card">
+      <div class="card-header"><h2>⚙️ <span data-i18n="setup_comp_title"></span></h2></div>
+      <div class="card-body">
+
+        <div class="form-group mb-2">
+          <label class="form-label" data-i18n="setup_comp_name"></label>
+          <input type="text" class="form-control" id="compName">
+        </div>
+
+        <div class="form-group mb-2">
+          <label class="form-label" data-i18n="setup_match_type"></label>
+          <div class="match-type-btns">
+            <button class="type-btn" id="btnWH4" onclick="setMatchType('WH4')">
+              WH4<br><small style="font-weight:400;font-size:.75rem;" data-i18n="setup_wh4"></small>
+            </button>
+            <button class="type-btn" id="btnWH6" onclick="setMatchType('WH6')">
+              WH6<br><small style="font-weight:400;font-size:.75rem;" data-i18n="setup_wh6"></small>
+            </button>
+          </div>
+        </div>
+
+        <div class="params-grid">
+          <div class="param-card">
+            <label data-i18n="setup_max_points"></label>
+            <input type="number" id="paramMaxPts" min="4" max="30" step="0.5">
+          </div>
+          <div class="param-card">
+            <label data-i18n="setup_min_women"></label>
+            <input type="number" id="paramMinWomen" min="0" max="6" step="1">
+          </div>
+          <div class="param-card">
+            <label data-i18n="setup_max_valid"></label>
+            <input type="number" id="paramMaxValid" min="0" max="6" step="1">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Match setup ── -->
+    <div class="card">
+      <div class="card-header"><h2>🤝 <span data-i18n="setup_match_title"></span></h2></div>
+      <div class="card-body">
+
+        <!-- Team A -->
+        <div class="form-group mb-2">
+          <label class="form-label" data-i18n="setup_team_a"></label>
+          <select class="form-control" id="teamA" onchange="onTeamChange()"></select>
+        </div>
+        <div class="team-setup-card" id="cardA">
+          <div class="color-row">
+            <div class="color-left">
+              <div class="color-pickers">
+                <div class="color-field">
+                  <label class="color-swatch-trigger">
+                    <span id="swatchJerseyA" class="color-swatch" style="background:#002395"></span>
+                    <input type="color" id="colorJerseyA" value="#002395" oninput="updateSwatch('A');updatePreview('A')">
+                  </label>
+                  <div class="color-field-label" data-i18n="setup_jersey_label"></div>
+                </div>
+                <div class="color-field">
+                  <label class="color-swatch-trigger">
+                    <span id="swatchTextA" class="color-swatch" style="background:#FFFFFF;border-color:#ddd"></span>
+                    <input type="color" id="colorTextA" value="#FFFFFF" oninput="updateSwatch('A');updatePreview('A')">
+                  </label>
+                  <div class="color-field-label" data-i18n="setup_number_label"></div>
+                </div>
+              </div>
+              <div class="color-presets" id="presetsA"></div>
+            </div>
+            <div id="previewA" class="color-jersey-preview"></div>
+          </div>
+        </div>
+
+        <div class="divider" style="margin:.5rem 0;"></div>
+
+        <!-- Team B -->
+        <div class="form-group mb-2">
+          <label class="form-label" data-i18n="setup_team_b"></label>
+          <select class="form-control" id="teamB" onchange="onTeamChange()"></select>
+        </div>
+        <div class="team-setup-card" id="cardB">
+          <div class="color-row">
+            <div class="color-left">
+              <div class="color-pickers">
+                <div class="color-field">
+                  <label class="color-swatch-trigger">
+                    <span id="swatchJerseyB" class="color-swatch" style="background:#FFFFFF;border-color:#ddd"></span>
+                    <input type="color" id="colorJerseyB" value="#FFFFFF" oninput="updateSwatch('B');updatePreview('B')">
+                  </label>
+                  <div class="color-field-label" data-i18n="setup_jersey_label"></div>
+                </div>
+                <div class="color-field">
+                  <label class="color-swatch-trigger">
+                    <span id="swatchTextB" class="color-swatch" style="background:#111111"></span>
+                    <input type="color" id="colorTextB" value="#111111" oninput="updateSwatch('B');updatePreview('B')">
+                  </label>
+                  <div class="color-field-label" data-i18n="setup_number_label"></div>
+                </div>
+              </div>
+              <div class="color-presets" id="presetsB"></div>
+            </div>
+            <div id="previewB" class="color-jersey-preview"></div>
+          </div>
+        </div>
+
+        <div id="sameTeamError" class="alert alert-danger mt-2" style="display:none;">
+          ⚠️ <span data-i18n="setup_same_team_error"></span>
+        </div>
+
+        <div class="mt-2">
+          <button class="btn btn-primary w-100" onclick="startMatch()" style="justify-content:center;">
+            <span data-i18n="setup_btn_start"></span> →
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+import { loadTranslations, t } from './js/i18n.js';
+import { renderNav }           from './js/nav.js';
+import { getState, setState, requireTeams } from './js/state.js';
+import { jerseyIconSvg, contrastColor }     from './js/utils.js';
+
+await loadTranslations();
+if (!requireTeams()) throw new Error('redirect');
+renderNav(3);
+
+const TEAMS = getState('teams') || [];
+const DEFAULTS = await fetch('./defaults.json').then(r => r.json());
+
+const PRESETS = [
+  '#002395','#C8102E','#1A1A1A','#E8530A',
+  '#007A33','#FFFFFF','#D4A017','#6B21A8',
+  '#0D7377','#64748B'
+];
+
+// ── Populate team selects ─────────────────────────────────────────────────────
+['teamA','teamB'].forEach(id => {
+  const sel = document.getElementById(id);
+  sel.innerHTML = `<option value="">${t('setup_select_team')}</option>`;
+  TEAMS.forEach(team => {
+    const opt = document.createElement('option');
+    opt.value = team.name; opt.textContent = team.name;
+    sel.appendChild(opt);
+  });
+});
+
+// ── Color presets ─────────────────────────────────────────────────────────────
+function hexToRgb(hex) {
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+['A','B'].forEach(side => {
+  const container = document.getElementById(`presets${side}`);
+  PRESETS.forEach(color => {
+    const btn = document.createElement('button');
+    btn.className = 'color-preset';
+    btn.style.background = color;
+    if (color === '#FFFFFF') btn.style.border = '2px solid #ccc';
+    btn.onclick = () => applyPreset(side, color);
+    container.appendChild(btn);
+  });
+});
+
+function applyPreset(side, color) {
+  document.getElementById(`colorJersey${side}`).value = color;
+  document.getElementById(`colorText${side}`).value   = contrastColor(color);
+  updateSwatch(side); updatePreview(side);
+  highlightPreset(side, color);
+}
+
+function highlightPreset(side, jc) {
+  document.querySelectorAll(`#presets${side} .color-preset`).forEach(b => {
+    b.classList.toggle('selected', b.style.backgroundColor === hexToRgb(jc) || b.style.background === jc);
+  });
+}
+
+window.updateSwatch = function(side) {
+  const jc = document.getElementById(`colorJersey${side}`).value;
+  const tc = document.getElementById(`colorText${side}`).value;
+  const light = hex => {
+    const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+    return (0.299*r+0.587*g+0.114*b)/255 > 0.55;
+  };
+  const swJ = document.getElementById(`swatchJersey${side}`);
+  const swT = document.getElementById(`swatchText${side}`);
+  swJ.style.background = jc; swJ.style.borderColor = light(jc) ? '#ddd' : 'rgba(0,0,0,0.10)';
+  swT.style.background = tc; swT.style.borderColor = light(tc) ? '#ddd' : 'rgba(0,0,0,0.10)';
+};
+
+window.updatePreview = function(side) {
+  const jc = document.getElementById(`colorJersey${side}`).value;
+  const tc = document.getElementById(`colorText${side}`).value;
+  document.getElementById(`preview${side}`).innerHTML = jerseyIconSvg(7, jc, tc, 56);
+};
+
+// ── Match type ────────────────────────────────────────────────────────────────
+let currentType = 'WH4';
+window.setMatchType = function(type) {
+  currentType = type;
+  document.getElementById('btnWH4').classList.toggle('active', type === 'WH4');
+  document.getElementById('btnWH6').classList.toggle('active', type === 'WH6');
+  const d = DEFAULTS[type];
+  document.getElementById('paramMaxPts').value   = d.max_points;
+  document.getElementById('paramMinWomen').value = d.min_women;
+  document.getElementById('paramMaxValid').value = d.max_valid;
+  document.getElementById('paramMaxPts').min     = d.max_points_min;
+  document.getElementById('paramMaxPts').max     = d.max_points_max;
+  document.getElementById('paramMinWomen').min   = d.min_women_min;
+  document.getElementById('paramMinWomen').max   = d.min_women_max;
+  document.getElementById('paramMaxValid').min   = d.max_valid_min;
+  document.getElementById('paramMaxValid').max   = d.max_valid_max;
+};
+
+window.onTeamChange = function() {
+  const a = document.getElementById('teamA').value;
+  const b = document.getElementById('teamB').value;
+  document.getElementById('sameTeamError').style.display = (a && b && a === b) ? 'flex' : 'none';
+};
+
+// ── Start match ───────────────────────────────────────────────────────────────
+window.startMatch = function() {
+  const teamA = document.getElementById('teamA').value;
+  const teamB = document.getElementById('teamB').value;
+  if (!teamA || !teamB) { alert(t('setup_select_both_teams')); return; }
+  if (teamA === teamB)  { alert(t('setup_same_team_error'));   return; }
+
+  const maxPts   = parseFloat(document.getElementById('paramMaxPts').value);
+  const minWomen = parseInt(document.getElementById('paramMinWomen').value);
+  const maxValid = parseInt(document.getElementById('paramMaxValid').value);
+  if (isNaN(maxPts) || isNaN(minWomen) || isNaN(maxValid)) {
+    alert(t('setup_invalid_params')); return;
+  }
+
+  const d = DEFAULTS[currentType];
+  setState('competition_setup', {
+    competition_name:  document.getElementById('compName').value.trim(),
+    match_type:        currentType,
+    players_on_court:  d.players_on_court,
+    max_points:        maxPts,
+    min_women:         minWomen,
+    max_valid:         maxValid,
+  });
+  setState('match_setup', {
+    team_a: { name:teamA, jersey_color:document.getElementById('colorJerseyA').value, text_color:document.getElementById('colorTextA').value },
+    team_b: { name:teamB, jersey_color:document.getElementById('colorJerseyB').value, text_color:document.getElementById('colorTextB').value },
+  });
+  location.href = './lineup.html';
+};
+
+// ── Restore previous values ───────────────────────────────────────────────────
+const savedComp  = getState('competition_setup');
+const savedMatch = getState('match_setup');
+
+if (savedComp) {
+  setMatchType(savedComp.match_type || 'WH4');
+  document.getElementById('paramMaxPts').value   = savedComp.max_points;
+  document.getElementById('paramMinWomen').value = savedComp.min_women;
+  document.getElementById('paramMaxValid').value = savedComp.max_valid;
+  document.getElementById('compName').value      = savedComp.competition_name || '';
+} else {
+  setMatchType('WH4');
+}
+
+if (savedMatch) {
+  document.getElementById('teamA').value         = savedMatch.team_a.name;
+  document.getElementById('teamB').value         = savedMatch.team_b.name;
+  document.getElementById('colorJerseyA').value  = savedMatch.team_a.jersey_color;
+  document.getElementById('colorTextA').value    = savedMatch.team_a.text_color;
+  document.getElementById('colorJerseyB').value  = savedMatch.team_b.jersey_color;
+  document.getElementById('colorTextB').value    = savedMatch.team_b.text_color;
+  onTeamChange();
+  highlightPreset('A', savedMatch.team_a.jersey_color);
+  highlightPreset('B', savedMatch.team_b.jersey_color);
+}
+
+updateSwatch('A'); updateSwatch('B');
+updatePreview('A'); updatePreview('B');
+</script>
+</body>
+</html>

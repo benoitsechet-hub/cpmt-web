@@ -1,0 +1,37 @@
+{
+  "_comment": "Default match parameters by game type. Can be edited without recompiling the exe.",
+
+  "WH4": {
+    "_comment": "Wheelchair Handball 4-player format (reduced)",
+    "players_on_court": 4,
+    "max_points":      11,
+    "max_points_min":  4,
+    "max_points_max":  20,
+    "min_women":       1,
+    "min_women_min":   0,
+    "min_women_max":   4,
+    "max_valid":       1,
+    "max_valid_min":   0,
+    "max_valid_max":   4
+  },
+
+  "WH6": {
+    "_comment": "Wheelchair Handball 6-player format (standard)",
+    "players_on_court": 6,
+    "max_points":      25,
+    "max_points_min":  6,
+    "max_points_max":  30,
+    "min_women":       1,
+    "min_women_min":   0,
+    "min_women_max":   6,
+    "max_valid":       4,
+    "max_valid_min":   0,
+    "max_valid_max":   6
+  },
+
+  "valid_classes": [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0],
+  "_comment_classes": "Valid IWBF sport classification values.",
+
+  "valid_statuses": ["C", "R-NAO", "R-FRD", "VIDEO", "VAL", "NE", ""],
+  "_comment_statuses": "Valid sport status codes. Empty string allowed (status not specified)."
+}
