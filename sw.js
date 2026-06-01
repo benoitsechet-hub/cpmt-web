@@ -1,7 +1,7 @@
 // ── Service Worker — offline cache ───────────────────────────────────────────
 // IMPORTANT: bump CACHE version on every deployment to force cache refresh.
 // Format: 'cpmt-YYYY-MM-DD' — update the date when deploying changes.
-const CACHE = 'cpmt-2026-05-21';
+const CACHE = 'cpmt-2026-05-22';
 
 // Core app assets — required for offline use
 const CORE_ASSETS = [
