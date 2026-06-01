@@ -19,6 +19,7 @@ const CORE_ASSETS = [
   './translations/fr.json',
   './translations/en.json',
   './defaults.json',
+  './version.json',
   './manifest.json',
   './CPMT_template.xlsx',
   './docs/CPMT_tutoriel.pdf',

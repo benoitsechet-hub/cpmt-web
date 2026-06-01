@@ -70,7 +70,7 @@
 </main>
 
 <footer style="text-align:center; padding:.5rem 1rem; font-size:.67rem; color:var(--text-muted); border-top:1px solid var(--border-light);">
-  © 2026 <span data-i18n="footer_author"></span> &nbsp;·&nbsp; v1.0
+  © 2026 <span data-i18n="footer_author"></span> &nbsp;·&nbsp; <span id="app-version">v1.0</span>
   &nbsp;·&nbsp; <span data-i18n="footer_internal"></span> — <span data-i18n="footer_rights"></span>
 </footer>
 
@@ -156,6 +156,12 @@ function createManually() {
   location.href = './summary.html';
 }
 window.createManually = createManually;
+
+// ── App version in footer ─────────────────────────────────────────────────────
+fetch('./version.json').then(r => r.json()).then(v => {
+  const el = document.getElementById('app-version');
+  if (el && v.version) el.textContent = v.version;
+}).catch(() => {});
 
 // ── Register service worker ───────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
