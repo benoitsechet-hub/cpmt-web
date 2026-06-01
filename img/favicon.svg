@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="1 1 30 30">
+  <defs>
+    <filter id="f">
+      <!-- Turn any opaque pixel to blue #2B6FD4, preserve transparency -->
+      <feColorMatrix type="matrix"
+        values="0 0 0 0 0.00
+                0 0 0 0 0.184
+                0 0 0 0 0.424
+                0 0 0 1 0"/>
+    </filter>
+  </defs>
+  <image href="logo_WH.png" x="0" y="0" width="32" height="32" filter="url(#f)"/>
+</svg>
