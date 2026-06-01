@@ -47,14 +47,13 @@
 import { loadTranslations, t } from './js/i18n.js';
 import { renderNav }           from './js/nav.js';
 import { getState, setState }  from './js/state.js';
+import { escHtml }             from './js/utils.js';
 
 await loadTranslations();
 renderNav(2);
 
-const DEFAULTS = {
-  valid_classes:  [0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0],
-  valid_statuses: ['','A','B','C','N'],
-};
+// Load defaults from single source of truth
+const DEFAULTS = await fetch('./defaults.json').then(r => r.json());
 let TEAMS   = getState('teams') || [];
 const CLASSES  = DEFAULTS.valid_classes;
 const STATUSES = DEFAULTS.valid_statuses;
@@ -202,7 +201,7 @@ window._confirmRename = ti => {
   const inp  = document.getElementById(`teamNameInput-${ti}`);
   const name = inp.value.trim();
   if (!name) { inp.focus(); return; }
-  if (TEAMS.some((t, i) => i !== ti && t.name === name)) { alert(t('summary_error_team_exists')); return; }
+  if (TEAMS.some((tm, i) => i !== ti && tm.name === name)) { alert(t('summary_error_team_exists')); return; }
   TEAMS[ti].name = name;
   document.getElementById(`teamName-${ti}`).textContent = name;
   window._cancelRename(ti); scheduleSave();
@@ -288,12 +287,9 @@ window.createTeam = () => {
   scheduleSave();
 };
 window.saveAndContinue = () => {
+  if (!TEAMS.length) { alert(t('summary_error_no_teams')); return; }
   if (saveTeams(false)) location.href = './setup.html';
 };
-
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
 
 renderTeams();
 </script>

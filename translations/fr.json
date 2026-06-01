@@ -32,6 +32,7 @@
   "summary_error_invalid_shirt": "Numéro de maillot invalide (1–99)",
   "summary_error_last_name_required": "Le nom de famille est obligatoire",
   "summary_error_team_exists": "Une équipe avec ce nom existe déjà",
+  "summary_error_no_teams": "Ajoutez au moins une équipe avant de continuer.",
   "summary_rename_team": "Renommer l'équipe",
   "summary_col_shirt": "Maillot",
   "summary_col_name": "Nom, Prénom",

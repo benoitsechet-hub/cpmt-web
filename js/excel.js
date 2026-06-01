@@ -91,6 +91,9 @@ function parsePlayer(row, validClasses, validStatuses) {
 }
 
 export function parseExcel(arrayBuffer, defaults) {
+  // Guard: SheetJS must be loaded (CDN or SW cache)
+  if (typeof XLSX === 'undefined') return { error:'upload_err_corrupt' };
+
   const validClasses  = defaults.valid_classes  || [];
   const validStatuses = defaults.valid_statuses || [];
 

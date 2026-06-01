@@ -16,6 +16,8 @@ const ASSETS = [
   './translations/en.json',
   './defaults.json',
   './manifest.json',
+  './CPMT_template.xlsx',
+  './docs/CPMT_tutoriel.pdf',
   './img/logo_WH.png',
   './img/flag_fr.svg',
   './img/flag_en.svg',

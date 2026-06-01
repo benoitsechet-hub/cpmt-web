@@ -150,7 +150,7 @@
 import { loadTranslations, t } from './js/i18n.js';
 import { renderNav }           from './js/nav.js';
 import { getState, requireSetup } from './js/state.js';
-import { jerseyIconSvg, isLight } from './js/utils.js';
+import { jerseyIconSvg, isLight, escHtml } from './js/utils.js';
 
 await loadTranslations();
 if (!requireSetup()) throw new Error('redirect');
@@ -166,8 +166,8 @@ const TCA = MATCH.team_a.text_color;
 const JCB = MATCH.team_b.jersey_color;
 const TCB = MATCH.team_b.text_color;
 
-const teamA = TEAMS.find(t => t.name === MATCH.team_a.name) || { name: MATCH.team_a.name, players: [] };
-const teamB = TEAMS.find(t => t.name === MATCH.team_b.name) || { name: MATCH.team_b.name, players: [] };
+const teamA = TEAMS.find(tm => tm.name === MATCH.team_a.name) || { name: MATCH.team_a.name, players: [] };
+const teamB = TEAMS.find(tm => tm.name === MATCH.team_b.name) || { name: MATCH.team_b.name, players: [] };
 
 const TEAM_A_PLAYERS = teamA.players;
 const TEAM_B_PLAYERS = teamB.players;
@@ -206,12 +206,12 @@ const lightB = isLight(JCB);
 const compName = COMP.competition_name || getState('competition_name') || '';
 
 document.getElementById('lineupTitle').innerHTML =
-  `<span style="color:${lightA ? '#1A2437' : JCA}">${MATCH.team_a.name}</span>
+  `<span style="color:${lightA ? '#1A2437' : JCA}">${escHtml(MATCH.team_a.name)}</span>
    <span class="vs-badge">VS</span>
-   <span style="color:${lightB ? '#1A2437' : JCB}">${MATCH.team_b.name}</span>`;
+   <span style="color:${lightB ? '#1A2437' : JCB}">${escHtml(MATCH.team_b.name)}</span>`;
 
 document.getElementById('lineupMeta').innerHTML =
-  `${compName ? `🏆 ${compName} &nbsp;·&nbsp; ` : ''}${COMP.match_type} &nbsp;·&nbsp;
+  `${compName ? `🏆 ${escHtml(compName)} &nbsp;·&nbsp; ` : ''}${COMP.match_type} &nbsp;·&nbsp;
    ${t('lineup_point_limit')}: <strong>${COMP.max_points}</strong> pts
    &nbsp;·&nbsp; ${t('lineup_women_min')}: <strong>${COMP.min_women}</strong>
    &nbsp;·&nbsp; ${t('lineup_valid_max')}: <strong>${COMP.max_valid}</strong>`;
@@ -226,7 +226,7 @@ document.getElementById('msbNameA').style.color = lightA ? 'var(--blue)' : JCA;
 document.getElementById('msbNameB').textContent = MATCH.team_b.name;
 document.getElementById('msbNameB').style.color = lightB ? 'var(--blue)' : JCB;
 document.getElementById('msbMatchInfo').innerHTML =
-  `${compName ? `🏆 ${compName} &nbsp;·&nbsp; ` : ''}${COMP.match_type} &nbsp;·&nbsp;
+  `${compName ? `🏆 ${escHtml(compName)} &nbsp;·&nbsp; ` : ''}${COMP.match_type} &nbsp;·&nbsp;
    ${COMP.max_points} pts &nbsp;·&nbsp; ♀ ≥${COMP.min_women} &nbsp;·&nbsp; val ≤${COMP.max_valid}`;
 
 document.getElementById('msbLabelA-pts').textContent   = `/ ${COMP.max_points}pts`;
@@ -270,7 +270,7 @@ function renderPlayers(team, players, jc, tc) {
     row.onclick = () => togglePlayer(team, i);
     row.innerHTML = `
       <div class="player-jersey-sm" id="jersey${team}-${i}"></div>
-      <div class="player-name-sm">${p.surname}, ${p.first_name}</div>
+      <div class="player-name-sm">${escHtml(p.surname)}, ${escHtml(p.first_name)}</div>
       <div class="player-class-sm">
         ${p.gender === 'female' ? '<span class="female-badge">♀</span>' : ''}${p.player_class}
       </div>`;
@@ -340,7 +340,7 @@ function updateUI(team) {
     div.className = 'court-player';
     div.onclick = () => togglePlayer(team, i);
     div.innerHTML = jerseyIconSvg(p.shirt_number, jc, tc, 52, p.gender === 'female') +
-      `<div class="court-player-name">${p.surname}</div>`;
+      `<div class="court-player-name">${escHtml(p.surname)}</div>`;
     courtEl.appendChild(div);
   });
 

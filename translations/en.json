@@ -32,6 +32,7 @@
   "summary_error_invalid_shirt": "Invalid shirt number (1–99)",
   "summary_error_last_name_required": "Last name is required",
   "summary_error_team_exists": "A team with this name already exists",
+  "summary_error_no_teams": "Please add at least one team before continuing.",
   "summary_rename_team": "Rename team",
   "summary_col_shirt": "Jersey",
   "summary_col_name": "Last name, First name",

@@ -80,13 +80,8 @@ import { renderNav }           from './js/nav.js';
 import { getState, setState, clearAll } from './js/state.js';
 import { parseExcel }          from './js/excel.js';
 
-// Load defaults from embedded JSON (same as config/defaults.json)
-const DEFAULTS = {
-  valid_classes:  [0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0],
-  valid_statuses: ['','A','B','C','N'],
-  players_on_court: { '4x4':4, '6x6':6 },
-  match_types: ['4x4','6x6']
-};
+// Load defaults from single source of truth
+const DEFAULTS = await fetch('./defaults.json').then(r => r.json());
 
 await loadTranslations();
 renderNav(1);
