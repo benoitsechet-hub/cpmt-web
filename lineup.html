@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPMT – Match</title>
+  <link rel="icon" href="./img/logo_WH.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    .app-main { padding: .75rem 1.25rem; }
+    @media (max-width: 768px) { .app-main { padding: .4rem .5rem; } }
+  </style>
+</head>
+<body>
+<header class="app-header" id="app-header"></header>
+
+<div id="lineupToast" class="lineup-toast"></div>
+
+<main class="app-main">
+
+  <!-- Lineup header (desktop) -->
+  <div class="lineup-header" id="lineupHeader">
+    <h2 id="lineupTitle"></h2>
+    <p id="lineupMeta"></p>
+  </div>
+
+  <!-- Mobile sticky stats bar -->
+  <div class="mobile-stats-bar" id="mobileStatsBar">
+    <div class="msb-matchinfo" id="msbMatchInfo"></div>
+    <div class="msb-teams-row">
+      <div class="msb-team" id="msbA">
+        <div class="msb-name" id="msbNameA"></div>
+        <div class="msb-chips">
+          <span class="msb-chip" id="msbA-pts">
+            <span class="msb-chip-val" id="msbValA-pts">0.0</span>
+            <span class="msb-chip-label" id="msbLabelA-pts"></span>
+          </span>
+          <span class="msb-chip" id="msbA-women">
+            <span class="msb-chip-val" id="msbValA-women">0</span>
+            <span class="msb-chip-label" id="msbLabelA-women"></span>
+          </span>
+          <span class="msb-chip" id="msbA-valid">
+            <span class="msb-chip-val" id="msbValA-valid">0</span>
+            <span class="msb-chip-label" id="msbLabelA-valid"></span>
+          </span>
+        </div>
+      </div>
+      <div class="msb-divider"><span class="msb-vs">VS</span></div>
+      <div class="msb-team msb-team-right" id="msbB">
+        <div class="msb-name" id="msbNameB"></div>
+        <div class="msb-chips">
+          <span class="msb-chip" id="msbB-pts">
+            <span class="msb-chip-val" id="msbValB-pts">0.0</span>
+            <span class="msb-chip-label" id="msbLabelB-pts"></span>
+          </span>
+          <span class="msb-chip" id="msbB-women">
+            <span class="msb-chip-val" id="msbValB-women">0</span>
+            <span class="msb-chip-label" id="msbLabelB-women"></span>
+          </span>
+          <span class="msb-chip" id="msbB-valid">
+            <span class="msb-chip-val" id="msbValB-valid">0</span>
+            <span class="msb-chip-label" id="msbLabelB-valid"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lineup-layout">
+
+    <!-- Team A panel -->
+    <div class="team-panel" id="panelA">
+      <div class="team-panel-header" id="headerA">
+        <div class="team-panel-name" id="panelNameA"></div>
+        <div class="team-stats">
+          <div class="stat-chip" id="statA-pts">
+            <span class="stat-value" id="valA-pts">0.0</span>
+            <span class="stat-label" id="lblA-pts"></span>
+          </div>
+          <div class="stat-chip" id="statA-women">
+            <span class="stat-value" id="valA-women">0</span>
+            <span class="stat-label" id="lblA-women"></span>
+          </div>
+          <div class="stat-chip" id="statA-valid">
+            <span class="stat-value" id="valA-valid">0</span>
+            <span class="stat-label" id="lblA-valid"></span>
+          </div>
+          <button class="btn-reset" onclick="clearTeam('A')">↺</button>
+        </div>
+      </div>
+      <div class="player-list" id="listA"></div>
+    </div>
+
+    <!-- Court -->
+    <div class="court-column">
+      <button class="court-toggle-btn" id="courtToggleBtn" onclick="toggleCourt()">🏐 <span id="courtBtnLabel"></span></button>
+      <div class="court-wrapper" id="courtWrapper">
+        <svg class="court-svg" viewBox="0 0 320 520" xmlns="http://www.w3.org/2000/svg">
+          <rect width="320" height="520" fill="#C8A96E"/>
+          <rect x="10" y="10" width="300" height="500" fill="none" stroke="white" stroke-width="2.5"/>
+          <line x1="10" y1="260" x2="310" y2="260" stroke="white" stroke-width="2"/>
+          <circle cx="160" cy="260" r="40" fill="none" stroke="white" stroke-width="2"/>
+          <circle cx="160" cy="260" r="3" fill="white"/>
+          <rect x="138" y="5" width="44" height="9" rx="1" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1.5"/>
+          <rect x="138" y="506" width="44" height="9" rx="1" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1.5"/>
+          <path d="M 48,10 A 90,75 0 0,0 138,85 L 182,85 A 90,75 0 0,0 272,10" fill="rgba(255,255,255,0.08)" stroke="white" stroke-width="2"/>
+          <path d="M 48,510 A 90,75 0 0,1 138,435 L 182,435 A 90,75 0 0,1 272,510" fill="rgba(255,255,255,0.08)" stroke="white" stroke-width="2"/>
+          <path d="M 10,46 A 135,112 0 0,0 138,122 L 182,122 A 135,112 0 0,0 310,46" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.5" stroke-dasharray="7,5"/>
+          <path d="M 10,474 A 135,112 0 0,1 138,398 L 182,398 A 135,112 0 0,1 310,474" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.5" stroke-dasharray="7,5"/>
+          <line x1="153" y1="97" x2="167" y2="97" stroke="white" stroke-width="2.5"/>
+          <line x1="153" y1="423" x2="167" y2="423" stroke="white" stroke-width="2.5"/>
+        </svg>
+        <div class="court-players">
+          <div class="court-half" id="courtA"></div>
+          <div class="court-half" id="courtB"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Team B panel -->
+    <div class="team-panel" id="panelB">
+      <div class="team-panel-header" id="headerB">
+        <div class="team-panel-name" id="panelNameB"></div>
+        <div class="team-stats">
+          <div class="stat-chip" id="statB-pts">
+            <span class="stat-value" id="valB-pts">0.0</span>
+            <span class="stat-label" id="lblB-pts"></span>
+          </div>
+          <div class="stat-chip" id="statB-women">
+            <span class="stat-value" id="valB-women">0</span>
+            <span class="stat-label" id="lblB-women"></span>
+          </div>
+          <div class="stat-chip" id="statB-valid">
+            <span class="stat-value" id="valB-valid">0</span>
+            <span class="stat-label" id="lblB-valid"></span>
+          </div>
+          <button class="btn-reset" onclick="clearTeam('B')">↺</button>
+        </div>
+      </div>
+      <div class="player-list" id="listB"></div>
+    </div>
+
+  </div>
+</main>
+
+<script type="module">
+import { loadTranslations, t } from './js/i18n.js';
+import { renderNav }           from './js/nav.js';
+import { getState, requireSetup } from './js/state.js';
+import { jerseyIconSvg, isLight } from './js/utils.js';
+
+await loadTranslations();
+if (!requireSetup()) throw new Error('redirect');
+renderNav(4);
+
+// ── Load state ────────────────────────────────────────────────────────────────
+const COMP  = getState('competition_setup');
+const MATCH = getState('match_setup');
+const TEAMS = getState('teams') || [];
+
+const JCA = MATCH.team_a.jersey_color;
+const TCA = MATCH.team_a.text_color;
+const JCB = MATCH.team_b.jersey_color;
+const TCB = MATCH.team_b.text_color;
+
+const teamA = TEAMS.find(t => t.name === MATCH.team_a.name) || { name: MATCH.team_a.name, players: [] };
+const teamB = TEAMS.find(t => t.name === MATCH.team_b.name) || { name: MATCH.team_b.name, players: [] };
+
+const TEAM_A_PLAYERS = teamA.players;
+const TEAM_B_PLAYERS = teamB.players;
+const MAX = COMP.players_on_court;
+
+const onCourt = { A: new Set(), B: new Set() };
+
+// ── Exceeded state (for beep transitions) ─────────────────────────────────────
+const exceededState = {
+  A: { pts: false, women: false, valid: false },
+  B: { pts: false, women: false, valid: false }
+};
+
+// ── Beep ──────────────────────────────────────────────────────────────────────
+let _audioCtx = null;
+function beep(freq = 880) {
+  try {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = _audioCtx.currentTime;
+    [0, 0.25].forEach(offset => {
+      const osc = _audioCtx.createOscillator();
+      const gain = _audioCtx.createGain();
+      osc.connect(gain); gain.connect(_audioCtx.destination);
+      osc.type = 'square'; osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, now + offset);
+      gain.gain.linearRampToValueAtTime(0.8, now + offset + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.2);
+      osc.start(now + offset); osc.stop(now + offset + 0.22);
+    });
+  } catch(e) {}
+}
+
+// ── Init header & meta ────────────────────────────────────────────────────────
+const lightA = isLight(JCA);
+const lightB = isLight(JCB);
+const compName = COMP.competition_name || getState('competition_name') || '';
+
+document.getElementById('lineupTitle').innerHTML =
+  `<span style="color:${lightA ? '#1A2437' : JCA}">${MATCH.team_a.name}</span>
+   <span class="vs-badge">VS</span>
+   <span style="color:${lightB ? '#1A2437' : JCB}">${MATCH.team_b.name}</span>`;
+
+document.getElementById('lineupMeta').innerHTML =
+  `${compName ? `🏆 ${compName} &nbsp;·&nbsp; ` : ''}${COMP.match_type} &nbsp;·&nbsp;
+   ${t('lineup_point_limit')}: <strong>${COMP.max_points}</strong> pts
+   &nbsp;·&nbsp; ${t('lineup_women_min')}: <strong>${COMP.min_women}</strong>
+   &nbsp;·&nbsp; ${t('lineup_valid_max')}: <strong>${COMP.max_valid}</strong>`;
+
+// Mobile stats bar
+const msbA = document.getElementById('msbA');
+const msbB = document.getElementById('msbB');
+msbA.style.borderLeft = `4px solid ${JCA}`;
+msbB.style.borderRight = `4px solid ${JCB}`;
+document.getElementById('msbNameA').textContent = MATCH.team_a.name;
+document.getElementById('msbNameA').style.color = lightA ? 'var(--blue)' : JCA;
+document.getElementById('msbNameB').textContent = MATCH.team_b.name;
+document.getElementById('msbNameB').style.color = lightB ? 'var(--blue)' : JCB;
+document.getElementById('msbMatchInfo').innerHTML =
+  `${compName ? `🏆 ${compName} &nbsp;·&nbsp; ` : ''}${COMP.match_type} &nbsp;·&nbsp;
+   ${COMP.max_points} pts &nbsp;·&nbsp; ♀ ≥${COMP.min_women} &nbsp;·&nbsp; val ≤${COMP.max_valid}`;
+
+['A','B'].forEach(side => {
+  const comp = COMP;
+  document.getElementById(`msbLabelA-pts`).textContent   = `/ ${comp.max_points}pts`;
+  document.getElementById(`msbLabelA-women`).textContent = `♀ ≥${comp.min_women}`;
+  document.getElementById(`msbLabelA-valid`).textContent = `val ≤${comp.max_valid}`;
+  document.getElementById(`msbLabelB-pts`).textContent   = `/ ${comp.max_points}pts`;
+  document.getElementById(`msbLabelB-women`).textContent = `♀ ≥${comp.min_women}`;
+  document.getElementById(`msbLabelB-valid`).textContent = `val ≤${comp.max_valid}`;
+});
+
+// Team panel headers
+const hdrA = document.getElementById('headerA');
+hdrA.style.background = JCA; hdrA.style.color = TCA;
+if (lightA) hdrA.classList.add('header-light');
+document.getElementById('panelNameA').textContent = MATCH.team_a.name;
+
+const hdrB = document.getElementById('headerB');
+hdrB.style.background = JCB; hdrB.style.color = TCB;
+if (lightB) hdrB.classList.add('header-light');
+document.getElementById('panelNameB').textContent = MATCH.team_b.name;
+
+// Stat chip labels
+const femBadge = `<span style="background:#FFB3C6;color:#C2185B;border-radius:2px;padding:0 2px;font-size:.58rem;font-weight:800;">♀</span>`;
+document.getElementById('lblA-pts').innerHTML   = `${t('lineup_stat_pts')} / ${COMP.max_points}`;
+document.getElementById('lblA-women').innerHTML = `${femBadge} ${t('lineup_stat_min')} ${COMP.min_women}`;
+document.getElementById('lblA-valid').innerHTML = `${t('lineup_stat_val_max')} ${COMP.max_valid}`;
+document.getElementById('lblB-pts').innerHTML   = `${t('lineup_stat_pts')} / ${COMP.max_points}`;
+document.getElementById('lblB-women').innerHTML = `${femBadge} ${t('lineup_stat_min')} ${COMP.min_women}`;
+document.getElementById('lblB-valid').innerHTML = `${t('lineup_stat_val_max')} ${COMP.max_valid}`;
+document.getElementById('courtBtnLabel').textContent = t('lineup_show_court');
+
+// ── Render player lists ───────────────────────────────────────────────────────
+function renderPlayers(team, players, jc, tc) {
+  const list = document.getElementById(`list${team}`);
+  list.innerHTML = '';
+  players.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'player-row';
+    row.id = `row${team}-${i}`;
+    row.dataset.team = team; row.dataset.idx = i;
+    row.dataset.class = p.player_class; row.dataset.gender = p.gender;
+    row.onclick = () => togglePlayer(team, i);
+    row.innerHTML = `
+      <div class="player-jersey-sm" id="jersey${team}-${i}"></div>
+      <div class="player-name-sm">${p.surname}, ${p.first_name}</div>
+      <div class="player-class-sm">
+        ${p.gender === 'female' ? '<span class="female-badge">♀</span>' : ''}${p.player_class}
+      </div>`;
+    list.appendChild(row);
+    document.getElementById(`jersey${team}-${i}`).innerHTML = jerseyIconSvg(p.shirt_number, jc, tc, 28, p.gender === 'female');
+  });
+}
+
+renderPlayers('A', TEAM_A_PLAYERS, JCA, TCA);
+renderPlayers('B', TEAM_B_PLAYERS, JCB, TCB);
+
+// ── Toggle player ─────────────────────────────────────────────────────────────
+window.togglePlayer = function(team, idx) {
+  const set = onCourt[team];
+  if (set.has(idx)) { set.delete(idx); }
+  else {
+    if (set.size >= MAX) { showToast(t('lineup_max_players_msg', { n: MAX })); return; }
+    set.add(idx);
+  }
+  updateUI(team);
+};
+
+// ── Update UI ─────────────────────────────────────────────────────────────────
+function updateUI(team) {
+  const set     = onCourt[team];
+  const players = team === 'A' ? TEAM_A_PLAYERS : TEAM_B_PLAYERS;
+  const jc      = team === 'A' ? JCA : JCB;
+  const tc      = team === 'A' ? TCA : TCB;
+
+  // Row styles
+  players.forEach((p, i) => {
+    document.getElementById(`row${team}-${i}`).classList.toggle('on-court', set.has(i));
+  });
+
+  // Compute stats
+  let ptsInt = 0, women = 0, valid = 0;
+  set.forEach(i => {
+    const p = players[i];
+    ptsInt += Math.round(p.player_class * 10);
+    if (p.gender === 'female') women++;
+    if (p.player_class === 5.0) valid++;
+  });
+  const pts = ptsInt / 10;
+
+  const ptsExc   = pts   > COMP.max_points;
+  const womenExc = women < COMP.min_women && set.size === MAX;
+  const validExc = valid > COMP.max_valid;
+
+  // Beep on new violations
+  if (ptsExc   && !exceededState[team].pts)   beep(880);
+  if (womenExc && !exceededState[team].women) beep(660);
+  if (validExc && !exceededState[team].valid) beep(550);
+  exceededState[team].pts   = ptsExc;
+  exceededState[team].women = womenExc;
+  exceededState[team].valid = validExc;
+
+  setStatChip(`stat${team}-pts`,   `val${team}-pts`,   pts.toFixed(1), ptsExc);
+  setStatChip(`stat${team}-women`, `val${team}-women`, women,          womenExc);
+  setStatChip(`stat${team}-valid`, `val${team}-valid`, valid,          validExc);
+
+  // Court
+  const courtEl = document.getElementById(`court${team}`);
+  courtEl.innerHTML = '';
+  set.forEach(i => {
+    const p = players[i];
+    const div = document.createElement('div');
+    div.className = 'court-player';
+    div.onclick = () => togglePlayer(team, i);
+    div.innerHTML = jerseyIconSvg(p.shirt_number, jc, tc, 52, p.gender === 'female') +
+      `<div class="court-player-name">${p.surname}</div>`;
+    courtEl.appendChild(div);
+  });
+
+  hideToast();
+}
+
+function setStatChip(chipId, valId, value, exceeded) {
+  const chip = document.getElementById(chipId);
+  const val  = document.getElementById(valId);
+  if (val) val.textContent = value;
+  if (chip) chip.classList.toggle('exceeded', exceeded);
+  // Mirror to mobile stats bar
+  const side = chipId.includes('A') ? 'A' : 'B';
+  const stat = chipId.replace(`stat${side}-`, '');
+  const msbChip = document.getElementById(`msb${side}-${stat}`);
+  const msbVal  = document.getElementById(`msbVal${side}-${stat}`);
+  if (msbChip) msbChip.classList.toggle('exceeded', exceeded);
+  if (msbVal)  msbVal.textContent = value;
+}
+
+// ── Clear team ────────────────────────────────────────────────────────────────
+window.clearTeam = function(team) { onCourt[team].clear(); updateUI(team); };
+
+// ── Court toggle ──────────────────────────────────────────────────────────────
+let courtVisible = false;
+window.toggleCourt = function() {
+  courtVisible = !courtVisible;
+  document.getElementById('courtWrapper').classList.toggle('court-visible', courtVisible);
+  const btn = document.getElementById('courtToggleBtn');
+  btn.classList.toggle('open', courtVisible);
+  document.getElementById('courtBtnLabel').textContent = courtVisible
+    ? t('lineup_hide_court') : t('lineup_show_court');
+};
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+let _toastTimer;
+function showToast(msg) {
+  const toast = document.getElementById('lineupToast');
+  toast.textContent = msg; toast.classList.add('visible');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => toast.classList.remove('visible'), 3000);
+}
+function hideToast() { document.getElementById('lineupToast').classList.remove('visible'); }
+
+// ── Sticky header height ──────────────────────────────────────────────────────
+(function() {
+  const hdr = document.querySelector('.app-header');
+  if (!hdr) return;
+  const update = () => document.documentElement.style.setProperty('--app-header-h', hdr.offsetHeight + 'px');
+  update();
+  window.addEventListener('resize', update);
+})();
+
+updateUI('A');
+updateUI('B');
+</script>
+</body>
+</html>
