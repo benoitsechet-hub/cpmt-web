@@ -158,7 +158,8 @@ function createManually() {
 window.createManually = createManually;
 
 // ── App version in footer ─────────────────────────────────────────────────────
-fetch('./version.json').then(r => r.json()).then(v => {
+// Fetch version bypassing cache so it always reflects latest deployment
+fetch('./version.json', { cache: 'no-store' }).then(r => r.json()).then(v => {
   const el = document.getElementById('app-version');
   if (el && v.version) el.textContent = v.version;
 }).catch(() => {});
