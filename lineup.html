@@ -229,15 +229,12 @@ document.getElementById('msbMatchInfo').innerHTML =
   `${compName ? `🏆 ${compName} &nbsp;·&nbsp; ` : ''}${COMP.match_type} &nbsp;·&nbsp;
    ${COMP.max_points} pts &nbsp;·&nbsp; ♀ ≥${COMP.min_women} &nbsp;·&nbsp; val ≤${COMP.max_valid}`;
 
-['A','B'].forEach(side => {
-  const comp = COMP;
-  document.getElementById(`msbLabelA-pts`).textContent   = `/ ${comp.max_points}pts`;
-  document.getElementById(`msbLabelA-women`).textContent = `♀ ≥${comp.min_women}`;
-  document.getElementById(`msbLabelA-valid`).textContent = `val ≤${comp.max_valid}`;
-  document.getElementById(`msbLabelB-pts`).textContent   = `/ ${comp.max_points}pts`;
-  document.getElementById(`msbLabelB-women`).textContent = `♀ ≥${comp.min_women}`;
-  document.getElementById(`msbLabelB-valid`).textContent = `val ≤${comp.max_valid}`;
-});
+document.getElementById('msbLabelA-pts').textContent   = `/ ${COMP.max_points}pts`;
+document.getElementById('msbLabelA-women').textContent = `♀ ≥${COMP.min_women}`;
+document.getElementById('msbLabelA-valid').textContent = `val ≤${COMP.max_valid}`;
+document.getElementById('msbLabelB-pts').textContent   = `/ ${COMP.max_points}pts`;
+document.getElementById('msbLabelB-women').textContent = `♀ ≥${COMP.min_women}`;
+document.getElementById('msbLabelB-valid').textContent = `val ≤${COMP.max_valid}`;
 
 // Team panel headers
 const hdrA = document.getElementById('headerA');

@@ -63,7 +63,7 @@ const STATUSES = DEFAULTS.valid_statuses;
 let _saveTimer = null;
 function scheduleSave() {
   clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(saveTeams, 1500);
+  _saveTimer = setTimeout(() => saveTeams(true), 1500);
 }
 function saveTeams(silent = false) {
   const valid = TEAMS.every(team => {

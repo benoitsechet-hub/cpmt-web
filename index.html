@@ -77,7 +77,7 @@
 <script type="module">
 import { loadTranslations, t } from './js/i18n.js';
 import { renderNav }           from './js/nav.js';
-import { setState, clearAll }  from './js/state.js';
+import { getState, setState, clearAll } from './js/state.js';
 import { parseExcel }          from './js/excel.js';
 
 // Load defaults from embedded JSON (same as config/defaults.json)
@@ -119,12 +119,20 @@ async function handleFile(file) {
     return;
   }
 
+  // Warn if a previous config existed
+  const hadConfig = !!(getState('teams')?.length || getState('match_setup'));
   clearAll();
   setState('teams', result.teams);
   setState('competition_name', result.competition_name || '');
 
   const playerCount = result.teams.reduce((s, tm) => s + tm.players.length, 0);
   showAlert('success', '✓ ' + t('home_success'));
+  if (hadConfig) {
+    const warn = document.createElement('div');
+    warn.className = 'alert alert-warning mt-2';
+    warn.textContent = t('home_config_cleared');
+    document.getElementById('uploadResult').appendChild(warn);
+  }
   document.getElementById('statTeams').textContent   = result.teams.length;
   document.getElementById('statPlayers').textContent = playerCount;
   document.getElementById('uploadStats').style.display = 'block';
