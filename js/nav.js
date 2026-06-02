@@ -59,4 +59,18 @@ export function renderNav(step) {
 
   // Update document lang attribute
   document.documentElement.lang = lang;
+
+  // ── Google Analytics (injected once on first nav render) ─────────────────
+  if (!document.getElementById('ga-script')) {
+    const s = document.createElement('script');
+    s.id  = 'ga-script';
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-E13F9ZWKCB';
+    s.async = true;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', 'G-E13F9ZWKCB');
+  }
 }
