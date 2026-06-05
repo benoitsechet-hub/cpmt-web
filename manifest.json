@@ -2,14 +2,14 @@
   "name": "CPMT – Classification Points Monitoring Tool",
   "short_name": "CPMT",
   "description": "Wheelchair Handball – Classification Points Monitoring Tool",
-  "start_url": "/CPMT-web/index.html",
-  "scope": "/CPMT-web/",
+  "start_url": "/cpmt-web/index.html",
+  "scope": "/cpmt-web/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#1A2437",
   "theme_color": "#1A2437",
   "icons": [
-    { "src": "/CPMT-web/img/logo_WH.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/CPMT-web/img/logo_WH.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/cpmt-web/img/logo_WH.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/cpmt-web/img/logo_WH.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }
