@@ -95,7 +95,7 @@
   "upload_err_missing_cols": "Sheet \"{sheet}\": missing columns → {cols}.",
   "upload_err_duplicate_cols": "Sheet \"{sheet}\": duplicate column names after normalisation → {cols}.",
 
-  "footer_author": "Benoît SECHET, international classifier",
-  "footer_internal": "Internal FFHB and EH4A uses only",
+  "footer_author": "Benoît SECHET, international IWBF and IHF classifier",
+  "footer_internal": "Internal EH4A uses only",
   "footer_rights": "Any use, reproduction, modification or distribution without prior agreement is prohibited."
 }

@@ -95,7 +95,7 @@
   "upload_err_missing_cols": "Feuille « {sheet} » : colonnes manquantes → {cols}.",
   "upload_err_duplicate_cols": "Feuille « {sheet} » : colonnes en double après normalisation → {cols}.",
 
-  "footer_author": "Benoît SECHET, classificateur international",
-  "footer_internal": "Usages internes FFHB et EH4A uniquement",
+  "footer_author": "Benoît SECHET, classificateur international IWBF et IHF",
+  "footer_internal": "Usages internes EH4A uniquement",
   "footer_rights": "Toute utilisation, reproduction, modification ou distribution sans accord préalable interdites."
 }
